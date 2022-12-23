@@ -1,12 +1,13 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@babylonjs/core': ^5.39.0
+  '@babylonjs/loaders': ^5.39.0
   '@sveltejs/adapter-auto': ^1.0.0
   '@sveltejs/kit': ^1.0.0
   '@types/three': ^0.146.0
   '@typescript-eslint/eslint-plugin': ^5.46.1
   '@typescript-eslint/parser': ^5.46.1
-  babylonjs: ^5.38.0
   eslint: ^8.29.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-svelte3: ^4.0.0
@@ -21,7 +22,8 @@ specifiers:
   vite: ^4.0.1
 
 dependencies:
-  babylonjs: 5.38.0
+  '@babylonjs/core': 5.39.0
+  '@babylonjs/loaders': 5.39.0_@babylonjs+core@5.39.0
   three: 0.147.0
 
 devDependencies:
@@ -43,6 +45,19 @@ devDependencies:
   vite: 4.0.1
 
 packages:
+
+  /@babylonjs/core/5.39.0:
+    resolution: {integrity: sha512-bGDsxFbIq9GeiwpojdnQB58s1EvDxJSzUK5C8hL3Wj8UqK6tCELNTEHonmJ8KruilLGQRpm2mrrPZWEzUvAKkA==}
+    dev: false
+
+  /@babylonjs/loaders/5.39.0_@babylonjs+core@5.39.0:
+    resolution: {integrity: sha512-AO1juAGQ0ZVWg7Dhr9OPHtO3jwEbLTHZTCVE5Va8F9xCjgtQOs8N+SP9KoTSshJd96UYdyPa8zgQWHk9/hu78Q==}
+    peerDependencies:
+      '@babylonjs/core': ^5.22.0
+      babylonjs-gltf2interface: ^5.22.0
+    dependencies:
+      '@babylonjs/core': 5.39.0
+    dev: false
 
   /@esbuild/android-arm/0.16.7:
     resolution: {integrity: sha512-yhzDbiVcmq6T1/XEvdcJIVcXHdLjDJ5cQ0Dp9R9p9ERMBTeO1dR5tc8YYv8zwDeBw1xZm+Eo3MRo8cwclhBS0g==}
@@ -592,11 +607,6 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
     dev: true
-
-  /babylonjs/5.38.0:
-    resolution: {integrity: sha512-9I8++4lwuLBGPJSyp3CJ4tX6AjUuLO3/wUpUe7prpRx38/gw/5SSl9MYz+u/4bghM8b/xxPUixf41nyDoyfgJA==}
-    requiresBuild: true
-    dev: false
 
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}

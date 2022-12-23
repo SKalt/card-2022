@@ -31,7 +31,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"babylonjs": "^5.38.0",
+		"@babylonjs/core": "^5.39.0",
+		"@babylonjs/loaders": "^5.39.0",
 		"three": "^0.147.0"
 	}
 }

@@ -1,29 +1,31 @@
-import {PerspectiveCamera, Scene, BoxGeometry, MeshNormalMaterial, Mesh, WebGLRenderer}  from 'three';
-import {ColladaLoader} from "three/examples/jsm/loaders/ColladaLoader"
-console.log(ColladaLoader)
-
-export function render(window: Window) {
-  const camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-  const scene = new Scene();
-  camera.position.z = 1;
-  
-  const geometry = new BoxGeometry( 0.2, 0.2, 0.2 );
-  const material = new MeshNormalMaterial();
-  
-  const mesh = new Mesh( geometry, material );
-  scene.add( mesh );
-  
-  const renderer = new WebGLRenderer( { antialias: true } );
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  renderer.setAnimationLoop( animation );
-  document.body.appendChild( renderer.domElement );
-    
-  function animation(time: number ) {
-  
-    mesh.rotation.x = time / 2000;
-    mesh.rotation.y = time / 1000;
-  
-    renderer.render( scene, camera );
-  
-  }
+import { GLTF2, GLTFFileLoader } from "@babylonjs/loaders/glTF";
+import {} from "@babylonjs/loaders";
+import { Scene } from "@babylonjs/core/scene";
+import { Engine, FreeCamera, HemisphericLight, Vector3 } from "@babylonjs/core";
+import { SceneLoader } from "@babylonjs/core";
+import { MeshBuilder } from "@babylonjs/core";
+export async function doTheThing(
+  ctx: HTMLCanvasElement | OffscreenCanvas | WebGL2RenderingContext,
+  baseUrl: string,
+) {
+  const engine = new Engine(ctx);
+  const scene = new Scene(engine);
+  const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+  camera.setTarget(Vector3.Zero());
+  const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+  // Dim the light a small amount 0 - 1
+  light.intensity = 0.7;
+  // scene.createDefaultCamera(true, true, true);
+  // scene.createDefaultSkybox(undefined);
+  await SceneLoader.AppendAsync(baseUrl, "patterson_park_.glb", scene, console.log, null)
+    .catch(console.error)
+    .finally(() => console.log("done"));
+  console.log({ scene });
+  const sphere = MeshBuilder.CreateSphere("ref", { diameter: 2, segments: 32 }, scene);
+  sphere.position.y = 1;
+  // const loader = new SceneLoader();
+  // loader.append()
+  // const loader = new GLTFFileLoader();
+  // const _loader = new GLTF2.GLTFLoader(loader)
+  // loader.loadAsync(scene, null, baseUrl, console.log, "patterson_park_.glb");
 }
