@@ -9,6 +9,9 @@ const config = {
   preprocess: preprocess(),
 
   kit: {
+    paths: {
+      base: "/2022",
+    },
     adapter: adapter(),
   },
 };
