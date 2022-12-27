@@ -1,19 +1,12 @@
 <script lang="ts">
   import { browser } from "$app/environment";
-  import { base } from "$app/paths";
-  let canvas: HTMLCanvasElement;
-  import { doTheThing } from "$lib/main";
   import { onMount } from "svelte";
+  import { base } from "$app/paths";
+  import { render3dScene } from "$lib/main";
   import { done, log } from "$lib/log";
-  // const handleResize = (e: UIEvent) => {
-  //   canvas.width
-  // }
-  if (browser) {
-    onMount(() => {
-      // let ctx = new WebGL2RenderingContext();
-      doTheThing(canvas, base);
-    });
-  }
+
+  let canvas: HTMLCanvasElement;
+  if (browser) onMount(() => render3dScene(canvas, base));
 </script>
 
 <canvas bind:this={canvas} />
@@ -39,6 +32,7 @@
     height: 100vh;
   }
   div.message {
+    font-family: Georgia, "Times New Roman", Times, serif;
     position: absolute;
     color: white;
     bottom: 2em;
@@ -47,7 +41,7 @@
     width: 100vw;
   }
   .log {
-    font-size: large;
+    font-size: medium;
     bottom: 40vh;
   }
 </style>
