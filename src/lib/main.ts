@@ -1,10 +1,9 @@
-import {} from "@babylonjs/loaders";
 import { Scene } from "@babylonjs/core/scene";
 import {
   ArcRotateCamera,
   Color3,
-  Color4,
   Engine,
+  HemisphericLight,
   // GlowLayer,
   PBRMaterial,
   PointColor,
@@ -15,6 +14,9 @@ import {
 import { SceneLoader } from "@babylonjs/core";
 import { MeshBuilder } from "@babylonjs/core";
 import { log, done } from "$lib/log";
+import * as gltf from "@babylonjs/loaders/glTF/2.0";
+import { GLTFFileLoader } from "@babylonjs/loaders";
+
 async function createEngine(canvas: HTMLCanvasElement): Promise<WebGPUEngine | Engine> {
   try {
     if (!(await WebGPUEngine.IsSupportedAsync)) {
@@ -45,20 +47,39 @@ async function createEngine(canvas: HTMLCanvasElement): Promise<WebGPUEngine | E
   }
 }
 
-export async function render3dScene(canvas: HTMLCanvasElement, baseUrl: string) {
+export async function render3dScene(canvas: HTMLCanvasElement) {
+  SceneLoader.RegisterPlugin(new GLTFFileLoader());
+
   const engine = await createEngine(canvas);
-  log.set({ percent: 50, message: "loading assets: 0% loaded" });
+  log.set({ percent: 49, message: "Creating scene" });
   const scene = new Scene(engine);
-  (window as any).scene = scene;
-  scene.createDefaultCamera(true, true, true);
-  scene.createDefaultSkybox(undefined);
+  log.set({ percent: 50, message: "loading assets: 0% loaded" });
+  const href = window.location.href;
+  const _baseUrl = href.endsWith("/") ? href : href + "/";
+  const file = "patterson_park.glb";
+
+  Object.assign(window as any, { scene, engine, SceneLoader });
   const onProgress = () => {
     log.set({ message: "loading assets: 90% loaded", percent: 70 });
   };
   {
+    {
+      const light = new HemisphericLight("light", Vector3.Zero(), scene);
+      light.intensity = 0.2;
+    }
     SceneLoader.ShowLoadingScreen = false;
-    await SceneLoader.AppendAsync(baseUrl, "patterson_park.glb", scene, onProgress, null)
-      .catch(console.error)
+    await SceneLoader.AppendAsync(
+      _baseUrl,
+      file.replace(/^\//, ""), // compiler somehow adds a leading slash?
+      scene,
+      onProgress,
+      null,
+    )
+      .catch((err) => {
+        console.error(err);
+        console.log(_baseUrl, file);
+        throw err;
+      })
       .finally(() => console.log("done"));
     log.set({ message: "preparing lights", percent: 80 });
     const led = new PBRMaterial("LED", scene);
@@ -68,9 +89,6 @@ export async function render3dScene(canvas: HTMLCanvasElement, baseUrl: string) 
     scene.meshes.forEach((m) => {
       if (m.name.startsWith("Basic_Sphere")) {
         m.material = led;
-        // glow.addIncludedOnlyMesh(m as Mesh);
-      } else {
-        // glow.addExcludedMesh(m as Mesh);
       }
     });
   }
@@ -80,18 +98,11 @@ export async function render3dScene(canvas: HTMLCanvasElement, baseUrl: string) 
     sphere.registerAfterWorldMatrixUpdate(async () => {
       // need to wait for sphere to be shifted up before creating snow
       const snow = new PointsCloudSystem("snow", 1, scene);
-      snow.addVolumePoints(sphere, 3000, PointColor.Stated, new Color4(255, 255, 255, 1));
+      snow.addVolumePoints(sphere, 3000, PointColor.Stated, Color3.White().toColor4());
       await snow.buildMeshAsync().then(() => sphere.dispose());
     });
     sphere.position.y = 13.7; // needed since world update doesn't take effect
   }
-  // {
-  //   log.set({ message: "initializing glow", percent: 99 });
-  //   const glow = new GlowLayer("glow", scene, { mainTextureSamples: 2 });
-  //   scene.meshes.forEach((m) => {
-  //     if (m.name != "snow" || m.name.startsWith("")) glow.addIncludedOnlyMesh(m as Mesh);
-  //   });
-  // }
   const camera = new ArcRotateCamera(
     "Camera",
     Math.PI / 3,
@@ -101,17 +112,11 @@ export async function render3dScene(canvas: HTMLCanvasElement, baseUrl: string) 
     scene,
     true,
   );
+  scene.cameras.filter((c) => c.name != "Camera").forEach((c) => c.dispose());
+  scene.clearColor = Color3.Black().toColor4();
   camera.attachControl(canvas, true);
   camera.useAutoRotationBehavior = true;
   scene.setActiveCameraById("Camera");
-  scene.cameras.filter((c) => c.name != "Camera").forEach((c) => c.dispose());
-  // const pipe = new DefaultRenderingPipeline("minimize_glow", true, scene, scene.cameras);
-  // pipe.samples = 4;
-  // pipe.depthOfFieldBlurLevel = DepthOfFieldEffectBlurLevel.Medium;
-  // pipe.depthOfField.focalLength = 1e-4;
-  // pipe.depthOfField.focusDistance = 1e-4;
-  // pipe.depthOfField.fStop = 3;
-  // pipe.depthOfFieldEnabled = false;
   window.addEventListener("resize", () => engine.resize());
   engine.runRenderLoop(() => scene.render());
   done.set(true);

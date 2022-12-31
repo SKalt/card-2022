@@ -1,12 +1,13 @@
 <script lang="ts">
   import { browser } from "$app/environment";
   import { onMount } from "svelte";
-  import { base } from "$app/paths";
+  // import { base } from "$app/paths";
   import { render3dScene } from "$lib/main";
   import { done, log } from "$lib/log";
 
   let canvas: HTMLCanvasElement;
-  if (browser) onMount(() => render3dScene(canvas, base));
+  // console.log({ base });
+  if (browser) onMount(() => render3dScene(canvas));
 </script>
 
 <canvas bind:this={canvas} />
